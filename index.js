@@ -1,10 +1,18 @@
 const express=require('express')
 const app=express()
 require('dotenv').config()
-const db=require('./config/mongoose')
+require('./config/mongoose')
+
+
+
+
+app.use(express.urlencoded())
+app.use(express.json())
+
 
 
 app.use('/api',require('./routes/index'))
+
 
 
 const port=process.env.PORT
