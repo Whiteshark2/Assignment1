@@ -24,7 +24,6 @@ module.exports.register=asyncHandler(async(req,res)=>{
 module.exports.login=asyncHandler(async(req,res)=>{
     const {email,password}=req.body
     const user=await User.findOne({email:email})
-
     if(user|| await bcrypt.compare(password, user.password)){
         res.json({
             id:user.id,
@@ -37,5 +36,19 @@ module.exports.login=asyncHandler(async(req,res)=>{
             message:"Invalid User Email/Password"
         })
     }
+})
 
+module.exports.profile=asyncHandler(async(req,res)=>{
+    const user=await User.findById(req.user.id)
+    if(user){
+        res.status(200).json({
+            id:user.id,
+            name:user.name,
+            email:user.email
+        })
+    }else{
+        res.status(401).json({
+            message:"Not Authorisied"
+        })
+    }
 })
