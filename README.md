@@ -6,5 +6,6 @@ Before saving user information in database, i have used bcryptjs to hash the pas
 when user sign up using email, his/her detail will be added to database only when he/she verifies her email sent on her mail, for this i used nodemailer and gmail.
 for email Verification , i used JWT to generate token for user's email,name,password . once email is verified ,his/her will be signed up.
 
-I have used HTML,CSS to created beautiful email template.
+I have used HTML,CSS to create beautiful email template.
+Also , i have dotenv for storing sentive info like ,email,secret token and password.
 
