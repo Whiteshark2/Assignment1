@@ -1,7 +1,9 @@
 const asyncHandler=require('express-async-handler')
 const User=require('../models/user')
 const bcrypt=require('bcryptjs')
+const jwt=require('jsonwebtoken')
 const generateToken=require('../config/generateToken')
+const {mailer}=require('../config/nodemailer')
 
 
 module.exports.register=asyncHandler(async(req,res)=>{
@@ -10,13 +12,10 @@ module.exports.register=asyncHandler(async(req,res)=>{
     if(user){
         res.json({message:"User already exist"})
     }else{
-        const hashedPassword=await bcrypt.hash(password,10)
-        const newUser=await User.create({
-            name,email,password:hashedPassword
-        })
-         res.status(200).json({
-            message:'User is created!',
-            newUser
+        const token = jwt.sign({name,email,password }, 'yourSecretKey', { expiresIn: '1h' });
+        mailer(name,email,token)
+        return res.json({
+            message:"Email Verification sent to your mail.Please verify in order to sign up successfully"
         })
     }
 })
@@ -52,3 +51,21 @@ module.exports.profile=asyncHandler(async(req,res)=>{
         })
     }
 })
+
+module.exports.verify = asyncHandler(async(req, res) => {
+    const { token } = req.params;
+    jwt.verify(token, 'yourSecretKey', async(err, decoded) => {
+        if (err) {
+            return res.status(400).json({ message: "Invalid or expired token" });
+        } else {
+            const {name, email,password } = decoded;
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const newUser = await User.create({
+                name,
+                email,
+                password: hashedPassword
+            });
+            res.status(200).json({ message: 'User created successfully', newUser });
+        }
+    });
+});
